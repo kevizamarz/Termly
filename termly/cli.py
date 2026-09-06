@@ -1,26 +1,10 @@
 import sys
 import re
-from termly.knowledge import ANSWERS
-from rapidfuzz.fuzz import ratio
+from termly.knowledge_engine import find_best_match
 from termly.runner import run_command
 from termly.analyzer import analyze
 from termly.suggester import suggest
 
-def find_best_match(question):
-	best_answer = None
-	best_score = 0
-
-	for answer in ANSWERS.values():
-		for phrase in answer["phrases"]:
-			score = ratio(question, phrase)
-
-			if score > best_score:
-				best_score = score
-				best_answer = answer
-	if best_score >= 50:
-		return best_answer
-
-	return None
 
 def ask(question):
 	question = question.lower()
@@ -31,9 +15,9 @@ def ask(question):
 		print("I don't know that yet")
 		return
 
-	print(f"Try: {answer['command']}")
-	print(f"What it does: {answer['description']}")
-	print(f"Example:  {answer['example']}")
+	print(f"Try: {answer.knowledge.command}")
+	print(f"What it does: {answer.knowledge.description}")
+	print(f"Example:  {answer.knowledge.example}")
 	return
 
 def explain(error):

@@ -1,4 +1,4 @@
-from termly.termly import run
+from termly.cli import run
 
 
 def test_command_not_found_flow(capsys):
