@@ -4,11 +4,14 @@ KNOWLEDGE = [
 	Knowledge(
 		intent="change_directory",
 		phrases= [
-			"open downloads",
-			"go to downloads",
-			"access downloads",
+			"open folder",
+			"go to directory",
+			"access folder",
 			],
-		command= "cd Downloads",
+		keywords= [
+			"open","go", "access", "directory", "folder",
+			],
+		command= "cd",
 		description= "Moves you into the Downloads folder",
 		example= "cd Downloads",
 	),
@@ -19,6 +22,9 @@ KNOWLEDGE = [
 			"list files",
 			"show files",
 			"show directory contents",
+			],
+		keywords= [
+			"list", "show", "files", "directory", "folder", "contents",
 			],
 		command= "ls",
 		description= "Lists all the files",

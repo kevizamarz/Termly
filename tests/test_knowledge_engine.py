@@ -10,11 +10,11 @@ def test_finds_list_directory():
 
 
 def test_finds_change_directory():
-    match = find_best_match("how do I go to downloads")
+    match = find_best_match("how do I go to folder")
 
     assert match is not None
     assert match.knowledge.intent == "change_directory"
-    assert match.knowledge.command == "cd Downloads"
+    assert match.knowledge.command == "cd"
 
 
 def test_returns_score():
@@ -25,6 +25,18 @@ def test_returns_score():
 
 
 def test_returns_none_for_unknown_question():
+    match = find_best_match("how do I configure a firewall")
+
+    assert match is None
+
+def test_understands_natural_list_files_question():
+    match = find_best_match("how do I see the files")
+
+    assert match is not None
+    assert match.knowledge.intent == "list_directories"
+
+
+def test_rejects_unrelated_question():
     match = find_best_match("how do I configure a firewall")
 
     assert match is None
