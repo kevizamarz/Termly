@@ -4,21 +4,26 @@ from termly.knowledge_engine import find_best_match
 from termly.runner import run_command
 from termly.analyzer import analyze
 from termly.suggester import suggest
+from termly.knowledge_provider import KnowledgeProvider
+from termly.knowledge_store import initialize_database, seed_knowledge
+from termly.paths import get_database_path
+from termly.knowledge import KNOWLEDGE
 
 
-def ask(question):
-	question = question.lower()
+def ask(question, provider):
+    question = question.lower()
+    answer = find_best_match(question, provider)
 
-	answer = find_best_match(question)
+    if answer is None:
+        print("I don't know that yet")
+        return
 
-	if answer is None:
-		print("I don't know that yet")
-		return
+    knowledge = answer.knowledge
 
-	print(f"Try: {answer.knowledge.command}")
-	print(f"What it does: {answer.knowledge.description}")
-	print(f"Example:  {answer.knowledge.example}")
-	return
+    print(f"Try: {knowledge.command}")
+    print(f"What it does: {knowledge.description}")
+    print(f"Example:  {knowledge.example}")
+    print(f"Confidence: {answer.score:.0f}%")
 
 def explain(error):
 	if "No such file or directory" in error:
@@ -67,18 +72,22 @@ def run(command):
 
 
 def main():
-	if len(sys.argv)>=3 and sys.argv[1]=="ask":
-		question = " ".join(sys.argv[2:])
-		ask(question)
-	elif len(sys.argv)>=3 and sys.argv[1] == "explain":
-		error = " ".join(sys.argv[2:])
-		explain(error)
-	elif len(sys.argv)>=3 and sys.argv[1]=="run":
-		command = sys.argv[2:]
-		run(command)
-	else:
-		print("Syntax: termly ask \"your question\"")
+    database = get_database_path()
+    initialize_database(database)
+    seed_knowledge(database, KNOWLEDGE)
+    provider = KnowledgeProvider(database)
 
+    if len(sys.argv) >= 3 and sys.argv[1] == "ask":
+        question = " ".join(sys.argv[2:])
+        ask(question, provider)
+    elif len(sys.argv) >= 3 and sys.argv[1] == "explain":
+        error = " ".join(sys.argv[2:])
+        explain(error)
+    elif len(sys.argv) >= 3 and sys.argv[1] == "run":
+        command = sys.argv[2:]
+        run(command)
+    else:
+        print('Syntax: termly ask "your question"')
 
 
 if __name__ == "__main__":

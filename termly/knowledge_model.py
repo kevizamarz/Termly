@@ -1,10 +1,18 @@
 from dataclasses import dataclass
 
+
 @dataclass
-class Knowledge:
-  intent: str
-  phrases: list[str]
-  keywords: list[str]
-  command: str
-  description: str
-  example: str
+class CommandKnowledge:
+    command: str
+    phrases: list[str]
+    keywords: list[str]
+    description: str
+    example: str
+    help_text: str | None
+    source: str
+
+
+@dataclass
+class CommandInventory:
+    command: str
+    path: str

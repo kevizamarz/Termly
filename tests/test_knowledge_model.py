@@ -1,16 +1,21 @@
-from termly.knowledge_model import Knowledge
+from termly.knowledge_model import CommandKnowledge
 
-def test_knowledge_creation():
-	knowledge = Knowledge(
-		intent = "list_directory",
-		phrases = ["list files", "show files"],
-		keywords= ["list", "show", "files", "directory"],
-		command="ls",
-		description="list files and driectories",
-		example="ls"
-	)
 
-	assert knowledge.intent == "list_directory"
-	assert "list files" in knowledge.phrases
-	assert knowledge.command == "ls" 
-	assert "files" in knowledge.keywords
+def test_command_knowledge_creation():
+    knowledge = CommandKnowledge(
+        command="ls",
+        phrases=["list files", "show files"],
+        keywords=["list", "show", "files", "directory"],
+        description="list files and directories",
+        example="ls",
+        help_text="List information about the FILEs",
+        source="help",
+    )
+
+    assert knowledge.command == "ls"
+    assert "list files" in knowledge.phrases
+    assert "files" in knowledge.keywords
+    assert knowledge.description == "list files and directories"
+    assert knowledge.example == "ls"
+    assert knowledge.help_text == "List information about the FILEs"
+    assert knowledge.source == "help"
