@@ -8,7 +8,7 @@ from termly.knowledge_provider import KnowledgeProvider
 from termly.knowledge_store import initialize_database, seed_knowledge
 from termly.paths import get_database_path
 from termly.knowledge import KNOWLEDGE
-
+from termly.knowledge_updater import update_command
 
 def ask(question, provider):
     question = question.lower()
@@ -24,6 +24,16 @@ def ask(question, provider):
     print(f"What it does: {knowledge.description}")
     print(f"Example:  {knowledge.example}")
     print(f"Confidence: {answer.score:.0f}%")
+
+def learn(command, database):
+    knowledge = update_command(database, command)
+
+    if knowledge is None:
+        print(f"Could not learn '{command}'")
+        return
+
+    print(f"Learned: {knowledge.command}")
+    print(f"What it does: {knowledge.description}")
 
 def explain(error):
 	if "No such file or directory" in error:
@@ -80,6 +90,9 @@ def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "ask":
         question = " ".join(sys.argv[2:])
         ask(question, provider)
+    elif len(sys.argv) >= 3 and sys.argv[1] == "learn":
+        command = sys.argv[2]
+        learn(command, database)
     elif len(sys.argv) >= 3 and sys.argv[1] == "explain":
         error = " ".join(sys.argv[2:])
         explain(error)

@@ -1,4 +1,5 @@
 from termly.discovery import discover_command, discover_command_inventory
+from termly.knowledge_extractor import extract_knowledge
 from termly.knowledge_store import (save_command, get_command, get_inventory, save_inventory,)
 
 def update_command(database, command):
@@ -10,17 +11,26 @@ def update_command(database, command):
     existing = get_command(database, command)
 
     if existing is None:
-        knowledge = discovered
-    else:
-        knowledge = type(existing)(
-            command=existing.command,
-            phrases=existing.phrases,
-            keywords=existing.keywords,
-            description=existing.description,
-            example=existing.example,
-            help_text=discovered.help_text,
-            source=existing.source,
+        knowledge = extract_knowledge(
+            command=discovered.command,
+            help_text=discovered.help_text or "",
         )
+    else:
+        if existing.source=="builtin":
+            knowledge = type(existing)(
+                command=existing.command,
+                phrases=existing.phrases,
+                keywords=existing.keywords,
+                description=existing.description,
+                example=existing.example,
+                help_text=discovered.help_text,
+                source=existing.source,
+            )
+        else:
+            knowledge = extract_knowledge(
+                command=discovered.command,
+                help_text=discovered.help_text or "",
+            )
 
     save_command(database, knowledge)
     return knowledge

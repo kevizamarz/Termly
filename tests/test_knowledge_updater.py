@@ -202,3 +202,39 @@ def test_incremental_update(tmp_path, monkeypatch):
     second_run = update_discovered_commands(database)
 
     assert second_run == []
+
+def test_update_new_command_extracts_knowledge(tmp_path, monkeypatch):
+    database = tmp_path / "termly.db"
+    initialize_database(database)
+
+    help_text = """Usage: chmod [OPTION]... MODE FILE...
+Change the mode of each FILE to MODE.
+"""
+
+    def fake_discover_command(command):
+        return CommandKnowledge(
+            command=command,
+            phrases=[],
+            keywords=[],
+            description="",
+            example=command,
+            help_text=help_text,
+            source="help",
+        )
+
+    monkeypatch.setattr(
+        "termly.knowledge_updater.discover_command",
+        fake_discover_command,
+    )
+
+    update_command(database, "chmod")
+
+    result = get_command(database, "chmod")
+
+    assert result is not None
+    assert result.description == "Change the mode of each FILE to MODE."
+    assert "change" in result.keywords
+    assert "mode" in result.keywords
+    assert result.phrases == ["change the mode of each file to mode"]
+    assert result.help_text == help_text
+    assert result.source == "help"
